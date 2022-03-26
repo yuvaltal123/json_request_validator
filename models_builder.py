@@ -1,31 +1,6 @@
 import json_reader
 from model_structure import Param, ParamBlock, Model
 
-single_model_str = """
-{
-	"path": "/users/info",
-	"method": "GET",
-	"query_params": [
-		{
-			"name": "with_extra_data",
-			"types": ["Boolean"],
-			"required": false
-		},
-		{
-			"name": "user_id",
-			"types": ["String", "UUID"],
-			"required": false
-		}
-	],
-	"headers": [
-		{
-			"name": "Authorization",
-			"types": ["String", "Auth-Token"],
-			"required": true
-		}
-	],
-	"body": []
-}"""
 
 class ModelsBuilder:
     """ Model Builder is responsible for building the models classes from json file"""
