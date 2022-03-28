@@ -6,7 +6,7 @@ from json_reader import load_from_json_str
 import json
 from template_structure import ContentBlock, Param, Template
 from models_builder import TemplateBuilder, TemplateTypes
-from request_validator import RequestValidator
+from validator import Validator
 
 class TestModelsBuilder(unittest.TestCase):
     single_model_str = """{
@@ -139,7 +139,7 @@ class TestRequestBuilder(unittest.TestCase):
         """ test a single request is built as expected (from a string)"""
         # create a request from json string
         request = self.request_builder.build_template_from_json_str(self.single_request_str)
-        request_validator = RequestValidator(self.models)
+        request_validator = Validator(self.models)
         request_validator.validate_request(request)
 
 
