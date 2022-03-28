@@ -1,9 +1,7 @@
 import datetime
 from template_structure import Template
-from template_structure import Value, Param
 import re
 import uuid
-from email_validator import validate_email, EmailNotValidError
 
 
 class Validator:
@@ -30,7 +28,6 @@ class Validator:
 
     def _validate_type(self, value, types: list):
         print('gothere')
-
         first_type_name = types[0]
         # if len(types) == 1:
         """known class"""
