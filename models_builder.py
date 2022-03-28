@@ -41,6 +41,8 @@ class TemplateBuilder:
             the key is the template unique key and value is the template"""
 
         template_dict = json_reader.load_from_json_str(json_str)
+        if not template_dict:
+            return False
         template = self._build_model_from_dict(template_dict)
         return template
 

@@ -4,37 +4,57 @@ import re
 import uuid
 
 
+
+class MyException(Exception):
+    pass
+
+
 class Validator:
     """ Verifies if a request is valid or "abnormal" based on the "learned" models """
-    type_mapping = {"String": str, "Int": int, "Boolean": bool, "List": list}
+    _type_mapping = {"String": str, "Int": int, "Boolean": bool, "List": list}
+
 
     def __init__(self, models: dict[str: Template]):
         self.models = models
 
-    def validate_request(self, request: Template):
+    def validate_request(self, request: Template) -> dict:
+
+        validation_results = dict()
+
         model = self.models[request.unique_key]
+        content_block = request.body
+        model_block = model.body
 
         required_fields_in_request = set()
-        for name in request.headers.params_dict:
+        for name in content_block.params_dict:
             print(name)
-            if name not in model.headers.params_dict:
-                print('field exist in request but not in model ', name)
+            if name not in model_block.params_dict:
+                validation_results[name] = 'field does not appear in model'
                 continue
-            if name in model.headers.required_params:
+            if name in model_block.required_params:
                 required_fields_in_request.add(name)
-            self._validate_type(request.headers.params_dict[name].value, model.headers.params_dict[name].types)
-        if model.headers.required_params - required_fields_in_request != set():
-            print('missing fields', model.headers.required_params - required_fields_in_request)
+            if not self._validate_type(content_block.params_dict[name].value, model_block.params_dict[name].types):
+                validation_results[name] = 'type mismatch'
 
-    def _validate_type(self, value, types: list):
-        print('gothere')
-        first_type_name = types[0]
-        # if len(types) == 1:
-        """known class"""
-        for type in types:
-            if type in self.type_mapping:
-                if isinstance(value, self.type_mapping[type]):
-                    print('valid python type')
+        required_fields_missing = model_block.required_params - required_fields_in_request
+        if required_fields_missing:
+            for missing_param in required_fields_missing:
+                validation_results[missing_param] = 'missing required parameter'
+
+        return validation_results
+
+    @classmethod
+    def _validate_type(cls, value, types: list) -> bool:
+        result = True
+        for type_name in types:
+            if type_name in cls._type_mapping:
+                result &= cls._is_valid_py_type(value, cls._type_mapping[type_name])
+            elif type_name in _custom_type_mapping:
+                result &= _custom_type_mapping[type_name](value)
+            else:
+                raise MyException(f'Unsupported type: {type_name}')
+                return False
+        return result
 
     @staticmethod
     def _is_valid_py_type(value, py_type):
@@ -73,3 +93,7 @@ class Validator:
             return True
         except ValueError:
             return False
+
+
+_custom_type_mapping = {"UUID": Validator._is_valid_uuid, "Auth-Token": Validator._is_valid_auth_token,
+                        "Email": Validator._is_valid_email}

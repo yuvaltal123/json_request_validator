@@ -38,3 +38,4 @@ def load_from_json_str(json_str):
         return json.loads(json_str)
     except ValueError:  # includes simplejson.decoder.JSONDecodeError
         print('Decoding JSON has failed')
+        return False

@@ -6,7 +6,7 @@ from json_reader import load_from_json_str
 import json
 from template_structure import ContentBlock, Param, Template
 from models_builder import TemplateBuilder, TemplateTypes
-from validator import Validator
+
 
 class TestModelsBuilder(unittest.TestCase):
     single_model_str = """{
@@ -105,42 +105,6 @@ class TestModelsBuilder(unittest.TestCase):
         self.assertSetEqual(model.query_params.required_params, expected_query_required_params)
         self.assertSetEqual(model.headers.required_params, expected_header_required_params)
         self.assertSetEqual(model.body.required_params, expected_body_required_params)
-
-class TestRequestBuilder(unittest.TestCase):
-
-    single_request_str = """{
-	"path": "/users/info",
-	"method": "GET",
-	"query_params": [
-		{
-			"name": "with_extra_data",
-			"value": false
-		}
-	],
-	"headers": [
-		{
-			"name": "Authorization",
-			"value": "Bearer 56ee9b7a-da8e-45a1-aade-a57761b912c4"
-		}
-		
-	],
-	"body": []
-}"""
-
-    def setUp(self):
-        self.json_fname = '../models.json'
-        with open(self.json_fname) as f:
-            self.json_models = json.load(f)
-        self.request_builder = TemplateBuilder(TemplateTypes.REQUEST)
-        self.models_builder = TemplateBuilder(TemplateTypes.MODEL)
-        self.models = self.models_builder.build_models_from_json_file(self.json_fname)
-
-    def test_build_from_single_dict(self):
-        """ test a single request is built as expected (from a string)"""
-        # create a request from json string
-        request = self.request_builder.build_template_from_json_str(self.single_request_str)
-        request_validator = Validator(self.models)
-        request_validator.validate_request(request)
 
 
 if __name__ == '__main__':
