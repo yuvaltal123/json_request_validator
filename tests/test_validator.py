@@ -4,7 +4,7 @@ from flask import Flask, jsonify, request
 
 from template_builder import TemplateBuilder
 from template_structure import TemplateTypes
-from validator import Validator
+from validator import RequestValidator
 
 
 class TestValidator(unittest.TestCase):
@@ -80,7 +80,7 @@ class TestValidator(unittest.TestCase):
         # create a request from json string
         request = self.request_builder.build_template_from_json_str(self.request_str_2)
         self.assertNotEqual(False, request)
-        request_validator = Validator(self.models)
+        request_validator = RequestValidator(self.models)
         res = request_validator.validate_request(request)
-        a= json.dumps(res)
+        a = json.dumps(res)
         print(res)
