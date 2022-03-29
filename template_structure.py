@@ -48,6 +48,7 @@ class Template:
 
     @property
     def unique_key(self):
+        """unique key per model, used to find model for request"""
         return self.path + ' ' + self.method
 
     def __str__(self):
