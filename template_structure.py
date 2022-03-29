@@ -12,6 +12,7 @@ class Content:
 
 
 class Param(Content):
+    """ Represents model param field"""
     def __init__(self, name: str, types: list[str], required: bool):
         super().__init__(name)
         self.types = types
@@ -19,19 +20,22 @@ class Param(Content):
 
 
 class Value(Content):
+    """ Represents request value field"""
     def __init__(self, name: str, value):
         super().__init__(name)
         self.value = value
 
 
 class ContentBlock:
+    """ Represents an object in the json template (query params, headers, body)"""
     def __init__(self, params_dict: dict[str: Content], required_params: set):
         self.params_dict = params_dict
         self.required_params = required_params
 
 
 class Template:
-    # Note: these fields should correspond to jsons valuse
+    """ Represent a template - can be request or model"""
+    # Note: these fields should correspond to jsons values
     block_names = {"query_params", "headers", "body"}
     path_name = "path"
     method_name = "method"

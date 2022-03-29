@@ -6,7 +6,7 @@ TEMPLATE_CONTENT_TYPES = {TemplateTypes.MODEL: Param, TemplateTypes.REQUEST: Val
 
 
 class TemplateBuilder:
-    """ Responsible for building the template object from json file/string"""
+    """ Responsible for building the template object from json file/string/dict"""
 
     def __init__(self, template_type: TemplateTypes):
         self.template_type = template_type
@@ -20,7 +20,6 @@ class TemplateBuilder:
             the key is the template unique key and value is the template"""
         # Note: using a dict (and not a list of models) to efficiently lookup for model param when going
         # over the requests later
-
         models = {}
         # read models as json
         json_models = json_reader.load_from_json_file(json_fname)
@@ -28,11 +27,11 @@ class TemplateBuilder:
             return False
         # store models - path,method use as unique key, 'headers','query_params','body' as values
         for model_dict in json_models:
-            model = self._build_model_from_dict(model_dict)
+            model = self.build_template_from_dict(model_dict)
             models[model.unique_key] = model
         return models
 
-    def build_template_from_json_str(self, json_str: str) -> [Template]:
+    def build_template_from_json_str(self, json_str: str) -> Template:
         """ Adding all templates from json file to the models storage dict
             the key is the template unique key and value is the template"""
         template_dict = json_reader.load_from_json_str(json_str)
@@ -40,18 +39,14 @@ class TemplateBuilder:
             return False
         return self.build_template_from_dict(template_dict)
 
-    def build_template_from_dict(self, template_dict):
-        template = self._build_model_from_dict(template_dict)
-        return template
-
-    def _build_model_from_dict(self, model_dict):
+    def build_template_from_dict(self, template_dict: dict) -> Template:
+        """ Build a template from a dictionary representing it"""
         blocks = dict()
         for block_name in Template.block_names:
-            params_dict, required_set = self._build_params_dict_per_block(model_dict[block_name])
+            params_dict, required_set = self._build_params_dict_per_block(template_dict[block_name])
             block = ContentBlock(params_dict, required_set)
             blocks[block_name] = block
-        template = Template(self.template_type, model_dict[Template.path_name], model_dict[Template.method_name], blocks)
-        return template
+        return Template(self.template_type, template_dict[Template.path_name], template_dict[Template.method_name], blocks)
 
     def _build_params_dict_per_block(self, list_of_param_dicts: list) -> tuple[dict[str: Param], set]:
         """ build for every block ('query_params', 'headers', 'body')

@@ -2,7 +2,7 @@ import json
 import unittest
 from flask import Flask, jsonify, request
 
-from models_builder import TemplateBuilder
+from template_builder import TemplateBuilder
 from template_structure import TemplateTypes
 from validator import Validator
 
@@ -35,12 +35,12 @@ class TestValidator(unittest.TestCase):
 	"headers": [
 		{
 			"name": "Authorization",
-			"value": "Bearer ebb3cbbe938c4776bd22a4ec2ea8b2ca"
+			"value": "Bearerebb3cbbe938c4776bd22a4ec2ea8b2cas!"
 		}
 	],
 	"body": [
 		{
-			"name": "order_idw",
+			"name": "order_id",
 			"value": "46da6390-7c78-4a1c-9efa-7c0396067ce4@"
 		},
 		{

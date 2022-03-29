@@ -5,7 +5,7 @@ import pickle
 from json_reader import load_from_json_str
 import json
 from template_structure import ContentBlock, Param, Template
-from models_builder import TemplateBuilder, TemplateTypes
+from template_builder import TemplateBuilder, TemplateTypes
 
 
 class TestModelsBuilder(unittest.TestCase):
@@ -50,7 +50,7 @@ class TestModelsBuilder(unittest.TestCase):
         # create a dict from test string
         dic = load_from_json_str(TestModelsBuilder.single_model_str)
         # create a model from the dict
-        model_test = self.model_builder._build_model_from_dict(dic)
+        model_test = self.model_builder.build_template_from_dict(dic)
         # get first model from json
         first_model_from_json = self.models[model_test.unique_key]
         # make sure that the model contents is the same
@@ -60,7 +60,7 @@ class TestModelsBuilder(unittest.TestCase):
         # create a dict from test string
         dic = load_from_json_str(TestModelsBuilder.single_model_str)
         # create a model from the dict
-        model_test = self.model_builder._build_model_from_dict(dic)
+        model_test = self.model_builder.build_template_from_dict(dic)
 
         path = dic['path']
         method = dic['method']

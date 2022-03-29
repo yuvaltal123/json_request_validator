@@ -1,54 +1,63 @@
 import datetime
 from template_structure import Template
+from collections import OrderedDict
 import re
 import uuid
-
-
-
-class MyException(Exception):
-    pass
 
 
 class Validator:
     """ Verifies if a request is valid or "abnormal" based on the "learned" models """
     _type_mapping = {"String": str, "Int": int, "Boolean": bool, "List": list}
 
-
     def __init__(self, models: dict[str: Template]):
         self.models = models
 
     def validate_request(self, request: Template) -> dict:
-        validation_results = dict()
+        """ validates a single request according to the corresponding model and return the desults"""
+        is_valid = True
+        validation_results = OrderedDict()
+        validation_results["result"] = "normal"
         model = self.models[request.unique_key]
-        for (k, content_block), (k2, model_block) in zip(request.blocks.items(), model.blocks.items()):
-            block_validations_results = dict()
-            required_fields_in_request = set()
-            for name in content_block.params_dict:
-                print(name)
-                if name not in model_block.params_dict:
-                    validation_results[name] = 'field does not appear in model'
-                    continue
-                if name in model_block.required_params:
-                    required_fields_in_request.add(name)
-                if not self._validate_type(content_block.params_dict[name].value, model_block.params_dict[name].types):
-                    validation_results[name] = 'type mismatch'
-
-            required_fields_missing = model_block.required_params - required_fields_in_request
-            if required_fields_missing:
-                for missing_param in required_fields_missing:
-                    validation_results[missing_param] = 'missing required parameter'
+        for (block_name, content_block), (_, model_block) in zip(request.blocks.items(), model.blocks.items()):
+            is_valid_block, block_validations_results = self._validate_single_block( content_block, model_block)
+            is_valid &= is_valid_block
+            validation_results[block_name] = block_validations_results
+        validation_results["result"] = "normal" if is_valid else "abnormal"
         return validation_results
+
+    def _validate_single_block(self, content_block, model_block):
+        is_valid = True
+        block_validations_results = list()
+        required_fields_in_request = set()
+        """ validate type mismatch or field that's not allowed in model"""
+        for name in content_block.params_dict:
+            if name not in model_block.params_dict:
+                block_validations_results.append({name: 'field does not appear in model'})
+                continue
+            if name in model_block.required_params:
+                required_fields_in_request.add(name)
+            if not self._validate_type(content_block.params_dict[name].value, model_block.params_dict[name].types):
+                block_validations_results.append({name: 'type mismatch'})
+        """ validate required fields"""
+        required_fields_missing = model_block.required_params - required_fields_in_request
+        if required_fields_missing:
+            for missing_param in required_fields_missing:
+                block_validations_results.append({missing_param: 'missing required parameter'})
+        """ determine result per block"""
+        if len(block_validations_results) != 0:
+            is_valid = False
+        return is_valid, block_validations_results
 
     @classmethod
     def _validate_type(cls, value, types: list) -> bool:
-        result = True
         for type_name in types:
+            result = True
             if type_name in cls._type_mapping:
                 result &= cls._is_valid_py_type(value, cls._type_mapping[type_name])
             elif type_name in _custom_type_mapping:
                 result &= _custom_type_mapping[type_name](value)
             else:
-                raise MyException(f'Unsupported type: {type_name}')
+                print(f'Unsupported type: {type_name}')
                 return False
         return result
 
