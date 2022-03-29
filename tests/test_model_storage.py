@@ -71,25 +71,25 @@ class TestModelsBuilder(unittest.TestCase):
         param2 = Param("user_id", ["String", "UUID"], False)
         required = set()
         new_query_params = ContentBlock({"with_extra_data": param1, 'user_id': param2}, required)
-        self.assertEqual(pickle.dumps(model_test.query_params), pickle.dumps(new_query_params))
+        self.assertEqual(pickle.dumps(model_test.blocks['query_params']), pickle.dumps(new_query_params))
         # test headers
         param = Param("Authorization", ["String", "Auth-Token"], True)
         required = {'Authorization'}
         new_headers = ContentBlock({"Authorization": param}, required)
-        self.assertEqual(pickle.dumps(model_test.headers), pickle.dumps(new_headers))
+        self.assertEqual(pickle.dumps(model_test.blocks['headers']), pickle.dumps(new_headers))
         # test body
         required = set()
         new_body = ContentBlock({}, required)
-        self.assertEqual(pickle.dumps(model_test.body), pickle.dumps(new_body))
+        self.assertEqual(pickle.dumps(model_test.blocks['body']), pickle.dumps(new_body))
         first_model_from_json = self.models[model_test.unique_key]
-        new_model = Template(TemplateTypes.MODEL, path, method, new_query_params, new_headers, new_body)
+        new_model = Template(TemplateTypes.MODEL, path, method, {'query_params': new_query_params, 'headers':  new_headers, 'body': new_body})
         print(new_model, '\n')
         print(first_model_from_json)
         self.assertEqual(pickle.dumps(new_model.method) == pickle.dumps(first_model_from_json.method), True)
         self.assertEqual(pickle.dumps(new_model.path) == pickle.dumps(first_model_from_json.path), True)
-        self.assertEqual(pickle.dumps(new_model.query_params) == pickle.dumps(first_model_from_json.query_params), True)
-        self.assertEqual(pickle.dumps(new_model.headers) == pickle.dumps(first_model_from_json.headers), True)
-        self.assertEqual(pickle.dumps(new_model.body) == pickle.dumps(first_model_from_json.body), True)
+        self.assertEqual(pickle.dumps(new_model.blocks['query_params']) == pickle.dumps(first_model_from_json.blocks['query_params']), True)
+        self.assertEqual(pickle.dumps(new_model.blocks['headers']) == pickle.dumps(first_model_from_json.blocks['headers']), True)
+        self.assertEqual(pickle.dumps(new_model.blocks['body']) == pickle.dumps(first_model_from_json.blocks['body']), True)
         self.assertEqual(pickle.dumps(new_model.unique_key) == pickle.dumps(first_model_from_json.unique_key), True)
         # todo check
         # self.assertEqual(pickle.dumps(new_model) == pickle.dumps(first_model_from_json), True)
@@ -102,9 +102,9 @@ class TestModelsBuilder(unittest.TestCase):
         expected_body_required_params = set()
         model = self.models[model_key]
 
-        self.assertSetEqual(model.query_params.required_params, expected_query_required_params)
-        self.assertSetEqual(model.headers.required_params, expected_header_required_params)
-        self.assertSetEqual(model.body.required_params, expected_body_required_params)
+        self.assertSetEqual(model.blocks['query_params'].required_params, expected_query_required_params)
+        self.assertSetEqual(model.blocks['headers'].required_params, expected_header_required_params)
+        self.assertSetEqual(model.blocks['body'].required_params, expected_body_required_params)
 
 
 if __name__ == '__main__':

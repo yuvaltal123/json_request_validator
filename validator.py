@@ -18,29 +18,25 @@ class Validator:
         self.models = models
 
     def validate_request(self, request: Template) -> dict:
-
         validation_results = dict()
-
         model = self.models[request.unique_key]
-        content_block = request.body
-        model_block = model.body
+        for (k, content_block), (k2, model_block) in zip(request.blocks.items(), model.blocks.items()):
+            block_validations_results = dict()
+            required_fields_in_request = set()
+            for name in content_block.params_dict:
+                print(name)
+                if name not in model_block.params_dict:
+                    validation_results[name] = 'field does not appear in model'
+                    continue
+                if name in model_block.required_params:
+                    required_fields_in_request.add(name)
+                if not self._validate_type(content_block.params_dict[name].value, model_block.params_dict[name].types):
+                    validation_results[name] = 'type mismatch'
 
-        required_fields_in_request = set()
-        for name in content_block.params_dict:
-            print(name)
-            if name not in model_block.params_dict:
-                validation_results[name] = 'field does not appear in model'
-                continue
-            if name in model_block.required_params:
-                required_fields_in_request.add(name)
-            if not self._validate_type(content_block.params_dict[name].value, model_block.params_dict[name].types):
-                validation_results[name] = 'type mismatch'
-
-        required_fields_missing = model_block.required_params - required_fields_in_request
-        if required_fields_missing:
-            for missing_param in required_fields_missing:
-                validation_results[missing_param] = 'missing required parameter'
-
+            required_fields_missing = model_block.required_params - required_fields_in_request
+            if required_fields_missing:
+                for missing_param in required_fields_missing:
+                    validation_results[missing_param] = 'missing required parameter'
         return validation_results
 
     @classmethod
@@ -81,7 +77,7 @@ class Validator:
 
     @staticmethod
     def _is_valid_auth_token(token):
-        regex = r'^Bearer+[a-zA-Z0-9]+$'
+        regex = r'^Bearer +[a-zA-Z0-9]{32}$'
         if re.search(regex, token):
             return True
         return False
@@ -96,4 +92,4 @@ class Validator:
 
 
 _custom_type_mapping = {"UUID": Validator._is_valid_uuid, "Auth-Token": Validator._is_valid_auth_token,
-                        "Email": Validator._is_valid_email}
+                        "Email": Validator._is_valid_email, "Date": Validator._is_valid_date}

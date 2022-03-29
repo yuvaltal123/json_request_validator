@@ -38,7 +38,7 @@ class TestTypeValidations(unittest.TestCase):
             self.assertEqual(False, validator_result)
 
     def test_valid_auth_tokens(self):
-        valid_auth_tokens = {"Bearerebb3cbbe938c4776bd22a4ec2ea8b2ca", "BearerAB", "Bearerab"}
+        valid_auth_tokens = {"Bearer ebb3cbbe938c4776bd22a4ec2ea8b2ca"}
         for token in valid_auth_tokens:
             validator_result = Validator._is_valid_auth_token(token)
             self.assertEqual(True, validator_result)
@@ -46,7 +46,7 @@ class TestTypeValidations(unittest.TestCase):
     def test_invalid_auth_tokens(self):
         invalid_auth_tokens = {"aBearerebb3cbbe938c4776bd22a4ec2ea8b2ca", "aearerebb3cbbe938c4776bd22a4ec2ea8b2ca", " ",
                                "Bearerebb3cbbe938c4776bd22a4ec2ea8b2c@", "Bearerebb3cbbe938c4776bd22a4ec2ea8b2c.",
-                               "Bearer"}
+                               "Bearer", "Bearerebb3cbbe938c4776bd22a4ec2ea8b2ca", "Bearer ebb3cbbe938c4776bd22a4ec2ea8b2cas"}
         for token in invalid_auth_tokens:
             validator_result = Validator._is_valid_auth_token(token)
             self.assertEqual(False, validator_result)

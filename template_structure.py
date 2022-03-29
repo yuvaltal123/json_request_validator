@@ -31,13 +31,16 @@ class ContentBlock:
 
 
 class Template:
-    def __init__(self, template_type: TemplateTypes, path: str, method: str, query_params: ContentBlock, headers: ContentBlock, body: ContentBlock):
+    # Note: these fields should correspond to jsons valuse
+    block_names = {"query_params", "headers", "body"}
+    path_name = "path"
+    method_name = "method"
+
+    def __init__(self, template_type: TemplateTypes, path: str, method: str, blocks: dict[str:ContentBlock]):
         self.template_type = template_type
         self.path = path
         self.method = method
-        self.query_params = query_params
-        self.headers = headers
-        self.body = body
+        self.blocks = blocks
 
     @property
     def unique_key(self):

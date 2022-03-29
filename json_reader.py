@@ -1,20 +1,8 @@
 import json
 
-const_titles = {'headers', 'query_params', 'body'}
-request_titles = {'name', 'value'}
-model_titles = {'name', 'types', 'required'}
-
-
-# code to validate fields exist:
-# required_fields = {'field'}
-# allowed_fields = required_fields | {'group', 'function'}
-#
-# d = {'field': 12,'bound': 123,'bddsund': 123, 'boufnd': 123}  # Set any value here
-#
-# if required_fields <= d.keys() <= allowed_fields:
-#     print("Yes!")
-# else:
-#     print("No!")
+# const_titles = {'headers', 'query_params', 'body'}
+# request_titles = {'name', 'value'}
+# model_titles = {'name', 'types', 'required'}
 
 
 def load_from_json_file(json_fname):

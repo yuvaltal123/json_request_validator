@@ -1,5 +1,6 @@
 import json
 import unittest
+from flask import Flask, jsonify, request
 
 from models_builder import TemplateBuilder
 from template_structure import TemplateTypes
@@ -39,8 +40,8 @@ class TestValidator(unittest.TestCase):
 	],
 	"body": [
 		{
-			"name": "order_id",
-			"value": "46da6390-7c78-4a1c-9efa-7c0396067ce4"
+			"name": "order_idw",
+			"value": "46da6390-7c78-4a1c-9efa-7c0396067ce4@"
 		},
 		{
 			"name": "address",
@@ -81,4 +82,5 @@ class TestValidator(unittest.TestCase):
         self.assertNotEqual(False, request)
         request_validator = Validator(self.models)
         res = request_validator.validate_request(request)
+        a= json.dumps(res)
         print(res)
